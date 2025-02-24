@@ -82,28 +82,12 @@ then
 
 	echo "alias osx-setup='${SCRIPT_DIR}/setup'" >> /root/.bashrc
 
-	echo -e "LANG=en_US.UTF-8\nLC_ALL=en_US.UTF-8" > /etc/environment
-	echo "set mouse-=a" > ~/.vimrc
-
 	if [ -e /etc/apt/sources.list.d/pve-enterprise.list ]; then rm -rf /etc/apt/sources.list.d/pve-enterprise.list; fi;
 
 	apt-get update > ${LOGFILE} 2>> ${LOGFILE}
 
-	if [ $? -ne 0 ]
-	then 
-		echo "Error with 'apt-get update' ..."
-		echo "Trying to change /etc/apt/sources.list"
- 		Country=$(curl -s https://ipinfo.io/country | tr '[:upper:]' '[:lower:]')
-		sed -i "s/ftp.$Country.debian.org/ftp.debian.org/g" /etc/apt/sources.list
-		echo "Retrying 'apt-get update'"
-		apt-get update >> ${LOGFILE} 2>> ${LOGFILE}
-		if [ $? -ne 0 ]; then echo "Error with `apt-get update ...`"; exit; fi
-	fi
-
 	apt install vim unzip zip sysstat parted wget iptraf git htop -y >> ${LOGFILE} 2>> ${LOGFILE}
 	if [ $? -ne 0 ]; then echo "Error with `apt-get install ...`"; exit; fi
-
-	sed -i 's/GRUB_TIMEOUT=5/GRUB_TIMEOUT=0/g' /etc/default/grub
 
 	if [ ${OSX_PLATFORM} == "AMD" ]
 	then
